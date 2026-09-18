@@ -1,33 +1,19 @@
 package main
 
-import (
-	"fmt"
-	"sync"
-)
-
-func worker(n int, myChannel chan int, wg *sync.WaitGroup) {
-	defer wg.Done()
-	myChannel <- n
-}
+import "fmt"
 
 func main() {
-	myChannel := make(chan int, 3)
-	var wg sync.WaitGroup
+	jobs := make(chan int, 3)
 
-	wg.Add(3)
+	go func() {
+		jobs <- 1
+		jobs <- 2
+		jobs <- 3
+		jobs <- 4
+	}()
 
-	go worker(1, myChannel, &wg)
-	go worker(2, myChannel, &wg)
-	go worker(3, myChannel, &wg)
-
-	wg.Wait()
-
-	msg := <-myChannel // block, if no wg.wait
-	fmt.Println(msg)
-
-	msg1 := <-myChannel
-	fmt.Println(msg1)
-
-	msg2 := <-myChannel
-	fmt.Println(msg2)
+	fmt.Println(<-jobs)
+	fmt.Println(<-jobs)
+	fmt.Println(<-jobs)
+	fmt.Println(<-jobs)
 }
